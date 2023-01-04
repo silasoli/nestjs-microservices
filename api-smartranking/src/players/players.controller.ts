@@ -9,7 +9,7 @@ export class PlayersController {
 
   @Post()
   async createOrUpdatePlayer(@Body() dto: CreatePlayerDto) {
-    await this.playersService.createOrUpdatePlayer(dto);
+    return this.playersService.createOrUpdatePlayer(dto);
   }
 
   @Get()
