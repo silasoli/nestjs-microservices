@@ -12,6 +12,12 @@ export class PlayersService {
     @InjectModel('Player') private readonly playerModel: Model<Player>,
   ) {}
 
+  public async checkExistenceOfPlayers(players: Array<string>): Promise<void> {
+    for (const player of players) {
+      await this.findPlayerById(player);
+    }
+  }
+
   public async createPlayer(dto: CreatePlayerDto): Promise<Player> {
     const existsPlayer = await this.playerModel.findOne({ email: dto.email });
 
@@ -27,7 +33,7 @@ export class PlayersService {
     return this.playerModel.find();
   }
 
-  public async findPlayerById(_id: string): Promise<Player> {
+  public async findPlayerById(_id: string | Player): Promise<Player> {
     const existsPlayer = await this.playerModel.findOne({ _id });
 
     if (!existsPlayer)
