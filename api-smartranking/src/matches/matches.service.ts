@@ -21,4 +21,8 @@ export class MatchesService {
   public async findOne(_id: string) {
     return this.matchModel.find({ _id });
   }
+
+  public async remove(_id: string): Promise<any> {
+    return this.matchModel.deleteOne({ _id });
+  }
 }

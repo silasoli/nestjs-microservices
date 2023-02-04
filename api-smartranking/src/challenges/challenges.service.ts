@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -79,7 +80,12 @@ export class ChallengesService {
 
   private async setMatchInChallenge(_id: string, matchId: string) {
     const dto = { status: ChallengeStatus.REALIZED, match: matchId };
-    await this.challengeModel.updateOne({ _id }, dto);
+    try {
+      await this.challengeModel.updateOne({ _id }, dto);
+    } catch (error) {
+      await this.matchesService.remove(matchId);
+      throw new InternalServerErrorException();
+    }
   }
 
   public async create(dto: CreateChallengeDto): Promise<Challenge> {
@@ -157,7 +163,9 @@ export class ChallengesService {
     const challenge = await this.findChallengeById(_id);
     this.checkWinnerinChallenge(winner, challenge.players);
 
-    await this.createMatchForChallenge(challenge, dto);
+    const match = await this.createMatchForChallenge(challenge, dto);
+
+    await this.setMatchInChallenge(_id, match._id);
   }
 
   public async remove(_id: string): Promise<void> {
