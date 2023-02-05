@@ -8,13 +8,15 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ValidationsParamsPipe } from '../common/custom-pipes/validations-params.pipe';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
 import { Category } from './interfaces/category.interface';
 
-@Controller('api/v1/categories')
+@ApiTags('Categories')
+@Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
@@ -29,22 +31,25 @@ export class CategoriesController {
     return this.categoriesService.findAllCategories();
   }
 
-  @Get('/:name')
-  async findByName(@Param('name') name: string): Promise<Category> {
-    return this.categoriesService.findCategoryByName(name);
+  @Get('/:id')
+  async findById(@Param('id') id: string): Promise<Category> {
+    return this.categoriesService.findCategoryById(id);
   }
 
-  @Put('/:name')
+  @Put('/:id')
   @UsePipes(ValidationPipe)
-  async updateByName(
-    @Param('name', ValidationsParamsPipe) name: string,
+  async updateOne(
+    @Param('id', ValidationsParamsPipe) id: string,
     @Body() dto: UpdateCategoryDto,
   ): Promise<void> {
-    await this.categoriesService.updateOneCategory(name, dto);
+    await this.categoriesService.updateOneCategory(id, dto);
   }
 
-  @Post('/:name/player/:id')
-  async assignPlayerToCategory(@Param() params: string[]): Promise<void> {
-    await this.categoriesService.assignPlayerToCategory(params);
+  @Post('/:id/player/:player')
+  async assignPlayerToCategory(
+    @Param('id') id: string,
+    @Param('player') player: string,
+  ): Promise<void> {
+    await this.categoriesService.assignPlayerToCategory(id, player);
   }
 }

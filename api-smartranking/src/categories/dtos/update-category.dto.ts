@@ -1,12 +1,6 @@
-import { ArrayMinSize, IsArray, IsOptional, IsString } from 'class-validator';
+import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { CreateCategoryDto } from './create-category.dto';
 
-export class UpdateCategoryDto {
-  @IsString()
-  @IsOptional()
-  description: string;
-
-  @IsArray()
-  @ArrayMinSize(1)
-  @IsOptional()
-  events: Array<Event>;
-}
+export class UpdateCategoryDto extends PartialType(
+  OmitType(CreateCategoryDto, ['category'] as const),
+) { }

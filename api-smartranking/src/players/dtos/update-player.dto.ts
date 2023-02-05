@@ -1,9 +1,6 @@
-import { IsNotEmpty } from 'class-validator';
+import { OmitType } from '@nestjs/swagger';
+import { CreatePlayerDto } from './create-player.dto';
 
-export class UpdatePlayerDto {
-  @IsNotEmpty()
-  readonly phone: string;
-
-  @IsNotEmpty()
-  readonly name: string;
-}
+export class UpdatePlayerDto extends OmitType(CreatePlayerDto, [
+  'email',
+] as const) {}
