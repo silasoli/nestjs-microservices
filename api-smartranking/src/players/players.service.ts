@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { UpdatePlayerDto } from './dtos/update-player.dto';
-
+import * as mongodb from 'mongodb';
 @Injectable()
 export class PlayersService {
   constructor(
@@ -18,14 +18,17 @@ export class PlayersService {
     }
   }
 
-  public async createPlayer(dto: CreatePlayerDto): Promise<Player> {
+  public async validateCreation(dto: CreatePlayerDto): Promise<void> {
     const existsPlayer = await this.playerModel.findOne({ email: dto.email });
 
     if (existsPlayer)
       throw new BadRequestException(
         `Player with email ${dto.email} already registered`,
       );
+  }
 
+  public async createPlayer(dto: CreatePlayerDto): Promise<Player> {
+    await this.validateCreation(dto);
     return this.playerModel.create(dto);
   }
 
@@ -47,11 +50,10 @@ export class PlayersService {
     dto: UpdatePlayerDto,
   ): Promise<void> {
     await this.findPlayerById(_id);
-
-    await this.playerModel.findOneAndUpdate({ _id }, { $set: dto });
+    await this.playerModel.updateOne({ _id }, dto);
   }
 
-  public async deletePlayerById(_id: string): Promise<any> {
+  public async deletePlayerById(_id: string): Promise<mongodb.DeleteResult> {
     await this.findPlayerById(_id);
     return this.playerModel.deleteOne({ _id });
   }
