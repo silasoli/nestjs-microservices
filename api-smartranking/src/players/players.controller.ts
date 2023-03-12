@@ -14,8 +14,10 @@ import { UpdatePlayerDto } from './dtos/update-player.dto';
 import { Player } from './interfaces/player.interface';
 import { ValidationsParamsPipe } from '../common/custom-pipes/validations-params.pipe';
 import { PlayersService } from './players.service';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('api/v1/players')
+@ApiTags('Players')
+@Controller('players')
 export class PlayersController {
   constructor(private readonly playersService: PlayersService) {}
 

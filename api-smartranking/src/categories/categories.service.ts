@@ -17,6 +17,17 @@ export class CategoriesService {
     private readonly playersService: PlayersService,
   ) {}
 
+  private async validateCreation(dto: CreateCategoryDto): Promise<void> {
+    const { category } = dto;
+
+    const registred = await this.categoryModel.findOne({
+      [`${category}`]: { $regex: `${category}`, $options: 'i' },
+    });
+
+    if (registred)
+      throw new BadRequestException(`Category: ${category} already registered`);
+  }
+
   public async findCategoryByPlayer(player: string): Promise<Category> {
     const existsCategory = await this.categoryModel.findOne({
       players: { $in: [player] },
@@ -31,14 +42,7 @@ export class CategoriesService {
   }
 
   public async createCategory(dto: CreateCategoryDto): Promise<Category> {
-    const existsCategory = await this.categoryModel.findOne({
-      category: dto.category,
-    });
-
-    if (existsCategory)
-      throw new BadRequestException(
-        `Category: ${dto.category} already registered`,
-      );
+    await this.validateCreation(dto);
 
     return this.categoryModel.create(dto);
   }
@@ -56,55 +60,37 @@ export class CategoriesService {
     return existsCategory;
   }
 
-  public async findCategoryByName(name: string): Promise<Category> {
-    const existsCategory = await this.categoryModel.findOne({ category: name });
-
-    if (!existsCategory)
-      throw new NotFoundException(`Category ${name} not found`);
-
-    return existsCategory;
-  }
-
   public async updateOneCategory(
-    name: string,
+    _id: string,
     dto: UpdateCategoryDto,
   ): Promise<void> {
-    await this.findCategoryByName(name);
-
-    await this.categoryModel.findOneAndUpdate(
-      { category: name },
-      { $set: dto },
-    );
+    await this.findCategoryById(_id);
+    await this.categoryModel.updateOne({ _id }, dto);
   }
 
   public async verifyPlayerToAssing(
+    categoryId: string,
     playerId: string,
-    category: string,
   ): Promise<void> {
-    await this.playersService.findPlayerById(playerId);
-
     const existsPlayerInCategory = await this.categoryModel.find({
-      category,
+      _id: categoryId,
       players: { $in: [playerId] },
     });
 
     if (existsPlayerInCategory)
-      throw new BadRequestException(
-        `Player already registered in category: ${category}`,
-      );
+      throw new BadRequestException(`Player already registered in category`);
   }
 
-  public async assignPlayerToCategory(params: string[]): Promise<void> {
-    const { name, id }: any = params;
+  public async assignPlayerToCategory(
+    categoryId: string,
+    playerId: string,
+  ): Promise<void> {
+    const existsCategory = await this.findCategoryById(categoryId);
+    const player = await this.playersService.findPlayerById(playerId);
+    await this.verifyPlayerToAssing(categoryId, playerId);
 
-    await this.verifyPlayerToAssing(id, name);
-    const existsCategory = await this.findCategoryByName(name);
+    existsCategory.players.push(player);
 
-    existsCategory.players.push(id);
-
-    await this.categoryModel.findOneAndUpdate(
-      { category: name },
-      { $set: existsCategory },
-    );
+    await this.categoryModel.updateOne({ _id: categoryId }, existsCategory);
   }
 }

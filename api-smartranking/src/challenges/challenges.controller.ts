@@ -10,6 +10,7 @@ import {
   Put,
   Logger,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ChallengesService } from './challenges.service';
 import { AssignChallengeMatchDto } from './dtos/assign-challenge-match.dto';
 import { CreateChallengeDto } from './dtos/create-challenge.dto';
@@ -17,7 +18,8 @@ import { UpdateChallengeDto } from './dtos/update-challenge.dto';
 import { Challenge } from './interfaces/challenge.interface';
 import { ChallengeStatusValidationPipe } from './pipes/challenge-status-validation.pipe';
 
-@Controller('api/v1/challenges')
+@ApiTags('Challenges')
+@Controller('challenges')
 export class ChallengesController {
   constructor(private readonly challengesService: ChallengesService) {}
 
