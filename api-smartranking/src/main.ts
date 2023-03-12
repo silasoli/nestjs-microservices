@@ -27,7 +27,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  Date.prototype.toJSON = () => {
+  Date.prototype.toJSON = function (): any {
     return momentTimezone(this)
       .tz('America/Sao_Paulo')
       .format('YYYY-MM-DD HH:mm:ss.SSS');

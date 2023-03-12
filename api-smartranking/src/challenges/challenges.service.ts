@@ -80,6 +80,7 @@ export class ChallengesService {
 
   private async setMatchInChallenge(_id: string, matchId: string) {
     const dto = { status: ChallengeStatus.REALIZED, match: matchId };
+
     try {
       await this.challengeModel.updateOne({ _id }, dto);
     } catch (error) {
@@ -149,10 +150,7 @@ export class ChallengesService {
 
     existsChallenge.challengeDateTime = dto.challengeDateTime;
 
-    await this.challengeModel.findOneAndUpdate(
-      { _id },
-      { $set: existsChallenge },
-    );
+    await this.challengeModel.updateOne({ _id }, existsChallenge);
   }
 
   public async assignChallengeMatch(
@@ -173,9 +171,6 @@ export class ChallengesService {
 
     existsChallenge.status = ChallengeStatus.CANCELED;
 
-    await this.challengeModel.findOneAndUpdate(
-      { _id },
-      { $set: existsChallenge },
-    );
+    await this.challengeModel.updateOne({ _id }, existsChallenge);
   }
 }
