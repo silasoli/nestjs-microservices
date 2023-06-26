@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Transport } from '@nestjs/microservices';
-import momentTimezone from 'moment-timezone';
 import { ConfigService } from '@nestjs/config';
+import * as momentTimezone from 'moment-timezone';
 
 const configService = new ConfigService();
 
@@ -18,7 +18,7 @@ async function bootstrap() {
         )}@${configService.get<string>('RABBITMQ_URL')}`,
       ],
       noAck: false,
-      queue: 'admin-backend',
+      queue: 'rankings',
     },
   });
 
