@@ -3,6 +3,7 @@ import { RankingsService } from './rankings.service';
 import { RankingsController } from './rankings.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProxyRMQModule } from '../proxyrmq/proxyrmq.module';
+import { RankingSchema } from './schemas/ranking.schema';
 
 @Module({
   imports: [
